@@ -17,18 +17,27 @@ final class ViewController: UIViewController {
         
         let url: URL = URL(string: "https://api.punkapi.com/v2/beers")!
         URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-            guard let data = data,
-                  let response,
-                    error == nil
+            guard
+                let data = data,
+                error == nil
             else {
                 return
             }
-            let str = String(data: data, encoding:  .utf8)
-            print(" Your data is: \(str ?? "")");
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            //обаботка данных
+            let model = try! decoder.decode([BeerDTO].self, from: data)
+            print(model)
         }).resume()
         //completionHandler выполняет какое-то действие в тот момент, когда мы получили данные с сервера.
     }
-
-
 }
 
+struct BeerDTO: Decodable {
+    let id: Int
+    let name: String
+    let tagline: String
+    let imageUrl: URL
+}
+
+//кодинг case(json)
